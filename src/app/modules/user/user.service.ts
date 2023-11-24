@@ -7,9 +7,9 @@ const createUserDB = async (user: User) => {
     { userId: savedUser.userId },
     { password: 0, orders: 0 },
   ).select({
-		_id: 0,
-		__v: 0
-	});
+    _id: 0,
+    __v: 0,
+  });
   return result;
 };
 
@@ -18,13 +18,25 @@ const getAllUsersFromDB = async () => {
     username: 1,
     fullName: 1,
     email: 1,
-		age:1,
+    age: 1,
     address: 1,
-		_id: 0
+    _id: 0,
+  });
+  return result;
+};
+
+const getSingleUserFromDB = async (userId: string) => {
+  const result = await UserModel.findOne({ userId }).select({
+    password: 0,
+    _id: 0,
+    __v: 0,
+    orders: 0,
   });
   return result;
 };
 
 export const UserServices = {
-  createUserDB,getAllUsersFromDB
+  createUserDB,
+  getAllUsersFromDB,
+  getSingleUserFromDB,
 };
