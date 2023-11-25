@@ -64,9 +64,75 @@ const getSingleUser = async (req: Request, res: Response) => {
       });
     }
   } catch (err) {
-		res.status(500).json({
+    res.status(500).json({
       success: false,
       message: 'something went wrong in Validation',
+      error: err,
+    });
+  }
+};
+
+const updateSingleUser = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+		const userData = req.body;
+		const zodParsedData = UserValidationSchema.parse(userData);
+ 
+    const result = await UserServices.updateSingleUserDataIntoDB(userId,zodParsedData);
+
+    if (result) {
+        res.status(200).json({
+          success: true,
+          message: 'User updated successfully!',
+          data: result,
+        });
+      
+    } else {
+      res.status(404).json({
+        success: false,
+        message: 'User not found',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: 'something went wrong',
+      error: err,
+    });
+  }
+};
+
+const deleteSingleUser = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const result = await UserServices.deleteSingleUserFromDB(userId);
+
+    if (result) {
+      if (result.deletedCount === 1) {
+        res.status(200).json({
+          success: true,
+          message: 'User deleted successfully!',
+          data: null,
+        });
+      }
+    } else {
+      res.status(404).json({
+        success: false,
+        message: 'User not found',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: 'something went wrong',
       error: err,
     });
   }
@@ -76,4 +142,6 @@ export const UserControllers = {
   createUser,
   getAllUsers,
   getSingleUser,
+  deleteSingleUser,
+	updateSingleUser
 };
