@@ -82,24 +82,23 @@ const deleteSingleUserFromDB = async (userId: string) => {
 
 const AddNewProductInOrder = async (userId: string, orderData: TOrder) => {
   const isUserExists = await User.isUserExists(userId);
-	
+
   if (isUserExists) {
     const user = await User.findOne({ userId });
-	
+
     if (user && Array.isArray(user.orders) && user.orders.length > 0) {
       const result = await User.updateOne(
         { userId },
         { $push: { orders: orderData } },
       );
-	
+
       return result;
     } else {
       const result = await User.updateOne(
         { userId },
         { $set: { orders: [orderData] } },
-   
       );
-	
+
       return result;
     }
   } else {
@@ -107,7 +106,19 @@ const AddNewProductInOrder = async (userId: string, orderData: TOrder) => {
   }
 };
 
+const getSingleUserOrderFromDB = async (userId: string) => {
+  const isUserExists = await User.isUserExists(userId);
 
+  if (isUserExists) {
+    const result = await User.findOne({ userId }).select({
+      orders: 1,
+      _id: 0,
+    });
+    return result;
+  } else {
+    return null;
+  }
+};
 
 export const UserServices = {
   createUserDB,
@@ -115,5 +126,6 @@ export const UserServices = {
   getSingleUserFromDB,
   deleteSingleUserFromDB,
   updateSingleUserDataIntoDB,
-	AddNewProductInOrder
+  AddNewProductInOrder,
+  getSingleUserOrderFromDB,
 };

@@ -177,6 +177,36 @@ const updateNewOrder = async (req: Request, res: Response) => {
   }
 };
 
+const getUserOrder = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const result = await UserServices.getSingleUserOrderFromDB(userId);
+
+    if (result) {
+      res.status(200).json({
+        success: true,
+        message: 'Order fetched successfully!',
+        data: result,
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: 'User not found',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: 'something went wrong in Validation',
+      error: err,
+    });
+  }
+};
+
 export const UserControllers = {
   createUser,
   getAllUsers,
@@ -184,4 +214,5 @@ export const UserControllers = {
   deleteSingleUser,
   updateSingleUser,
   updateNewOrder,
+	getUserOrder
 };
