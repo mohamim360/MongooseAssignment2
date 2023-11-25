@@ -1,6 +1,6 @@
 // Importing modules
 import cors from 'cors';
-import express, { Application } from 'express';
+import express, { Application, Request, Response } from 'express';
 import { UserRoutes } from './app/modules/user/user.route';
 
 const app: Application = express();
@@ -11,5 +11,10 @@ app.use(cors());
 
 //user routes
 app.use('/api', UserRoutes);
+app.use('/', (req: Request, res: Response) => {
+  res.status(200).json({
+		success:true,
+		message:'Mongoose Assignment 2'
+	})});
 
 export default app;
