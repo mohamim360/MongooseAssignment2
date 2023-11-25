@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+// Schemas for validating full name, address, order, and user data
 const FullNameValidationSchema = z.object({
   firstName: z.string().min(1),
   lastName: z.string().min(1),

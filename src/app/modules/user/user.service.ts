@@ -2,6 +2,8 @@ import config from '../../config';
 import { TOrder, TUser } from './user.interface';
 import { User } from './user.model';
 import bcrypt from 'bcrypt';
+
+// Create a new user in the database
 const createUserDB = async (user: TUser) => {
   const savedUser = await User.create(user);
   const result = await User.findOne(
@@ -15,6 +17,7 @@ const createUserDB = async (user: TUser) => {
   return result;
 };
 
+// Get all users from the database
 const getAllUsersFromDB = async () => {
   const result = await User.find().select({
     username: 1,
@@ -27,6 +30,7 @@ const getAllUsersFromDB = async () => {
   return result;
 };
 
+// Get a single user from the database
 const getSingleUserFromDB = async (userId: string) => {
   const isUserExists = await User.isUserExists(userId);
 
@@ -43,6 +47,7 @@ const getSingleUserFromDB = async (userId: string) => {
   }
 };
 
+// Update a single user's data in the database
 const updateSingleUserDataIntoDB = async (userId: string, userData: TUser) => {
   const isUserExists = await User.isUserExists(userId);
 
@@ -69,6 +74,7 @@ const updateSingleUserDataIntoDB = async (userId: string, userData: TUser) => {
   }
 };
 
+// Delete a single user from the database
 const deleteSingleUserFromDB = async (userId: string) => {
   const isUserExists = await User.isUserExists(userId);
 
@@ -80,6 +86,7 @@ const deleteSingleUserFromDB = async (userId: string) => {
   }
 };
 
+// Add a new product to a user's order in the database
 const AddNewProductInOrder = async (userId: string, orderData: TOrder) => {
   const isUserExists = await User.isUserExists(userId);
 
@@ -106,6 +113,7 @@ const AddNewProductInOrder = async (userId: string, orderData: TOrder) => {
   }
 };
 
+// Get a single user's order from the database
 const getSingleUserOrderFromDB = async (userId: string) => {
   const isUserExists = await User.isUserExists(userId);
 
@@ -120,13 +128,14 @@ const getSingleUserOrderFromDB = async (userId: string) => {
   }
 };
 
+// Get the total price of a single user's order from the database
 const getTotalPriceOfSingleUserOrder = async (userId: string) => {
   const isUserExists = await User.isUserExists(userId);
 
   if (isUserExists) {
     const result = await User.aggregate([
       {
-        $match: { userId: 1 },
+        $match: { userId: Number(userId)  },
       },
       {
         $unwind: '$orders',

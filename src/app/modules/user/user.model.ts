@@ -1,7 +1,15 @@
 import { Schema, model } from 'mongoose';
-import { TAddress, TFullName, TOrder, TUser, UserModel } from './user.interface';
+import {
+  TAddress,
+  TFullName,
+  TOrder,
+  TUser,
+  UserModel,
+} from './user.interface';
 import bcrypt from 'bcrypt';
 import config from '../../config';
+
+// SubSchemas for user details
 const fullNameSchema = new Schema<TFullName>(
   {
     firstName: { type: String, required: [true, 'First name is required'] },
@@ -9,7 +17,6 @@ const fullNameSchema = new Schema<TFullName>(
   },
   { _id: false },
 );
-
 const addressSchema = new Schema<TAddress>(
   {
     street: { type: String, required: [true, 'Street is required'] },
@@ -18,8 +25,6 @@ const addressSchema = new Schema<TAddress>(
   },
   { _id: false },
 );
-
-
 const orderSchema = new Schema<TOrder>(
   {
     productName: { type: String, required: [true, 'Product name is required'] },
@@ -29,6 +34,7 @@ const orderSchema = new Schema<TOrder>(
   { _id: false },
 );
 
+// User schema definition
 const userSchema = new Schema<TUser, UserModel>({
   userId: {
     type: Number,
@@ -47,14 +53,16 @@ const userSchema = new Schema<TUser, UserModel>({
   isActive: { type: Boolean, required: [true, 'isActive is required'] },
   hobbies: { type: [String], required: [true, 'Hobbies are required'] },
   address: { type: addressSchema, required: [true, 'Address is required'] },
-  orders: { type: [orderSchema],required: false },
+  orders: { type: [orderSchema], required: false },
 });
 
-userSchema.statics.isUserExists = async function (userId: string) {
-  const existingUser = await User.findOne({ userId });
+// Static method to check if a user exists
+userSchema.statics.isUserExists = async function (id: string) {
+  const existingUser = await User.findOne({ userId: id });
   return existingUser;
 };
 
+// Pre-save hook to hash user password
 userSchema.pre('save', async function (next) {
   // eslint-disable-next-line @typescript-eslint/no-this-alias
   const user = this;
@@ -65,6 +73,5 @@ userSchema.pre('save', async function (next) {
   );
   next();
 });
-
 
 export const User = model<TUser, UserModel>('User', userSchema);

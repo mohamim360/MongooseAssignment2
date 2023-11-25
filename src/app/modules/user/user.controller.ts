@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { UserServices } from './user.service';
 import { ValidationSchema } from './user.validation';
 
+// Create a new user
 const createUser = async (req: Request, res: Response) => {
   try {
     const userData = req.body;
@@ -24,6 +25,7 @@ const createUser = async (req: Request, res: Response) => {
   }
 };
 
+// Get all users
 const getAllUsers = async (req: Request, res: Response) => {
   try {
     const result = await UserServices.getAllUsersFromDB();
@@ -42,6 +44,7 @@ const getAllUsers = async (req: Request, res: Response) => {
   }
 };
 
+// Get a single user
 const getSingleUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
@@ -72,6 +75,7 @@ const getSingleUser = async (req: Request, res: Response) => {
   }
 };
 
+// Update a user
 const updateSingleUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
@@ -108,6 +112,7 @@ const updateSingleUser = async (req: Request, res: Response) => {
   }
 };
 
+// Delete a user
 const deleteSingleUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
@@ -140,6 +145,7 @@ const deleteSingleUser = async (req: Request, res: Response) => {
   }
 };
 
+// Update a user's order
 const updateNewOrder = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
@@ -177,6 +183,7 @@ const updateNewOrder = async (req: Request, res: Response) => {
   }
 };
 
+// Get a user's order
 const getUserOrder = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
@@ -207,6 +214,7 @@ const getUserOrder = async (req: Request, res: Response) => {
   }
 };
 
+// Get total sum of a user's order
 const getTotalSumOfOrder = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
