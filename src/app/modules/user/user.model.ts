@@ -19,6 +19,7 @@ const addressSchema = new Schema<TAddress>(
   { _id: false },
 );
 
+
 const orderSchema = new Schema<TOrder>(
   {
     productName: { type: String, required: [true, 'Product name is required'] },
@@ -29,8 +30,16 @@ const orderSchema = new Schema<TOrder>(
 );
 
 const userSchema = new Schema<TUser, UserModel>({
-  userId: { type: Number, required: [true, 'User ID is required'], unique: true },
-  username: { type: String, required: [true, 'Username is required'], unique: true },
+  userId: {
+    type: Number,
+    required: [true, 'User ID is required'],
+    unique: true,
+  },
+  username: {
+    type: String,
+    required: [true, 'Username is required'],
+    unique: true,
+  },
   password: { type: String, required: [true, 'Password is required'] },
   fullName: { type: fullNameSchema, required: [true, 'Full name is required'] },
   age: { type: Number, required: [true, 'Age is required'] },
@@ -47,15 +56,15 @@ userSchema.statics.isUserExists = async function (userId: string) {
 };
 
 userSchema.pre('save', async function (next) {
-
   // eslint-disable-next-line @typescript-eslint/no-this-alias
-  const user = this; 
-  
+  const user = this;
+
   user.password = await bcrypt.hash(
     user.password,
     Number(config.bcrypt_salt_rounds),
   );
   next();
 });
+
 
 export const User = model<TUser, UserModel>('User', userSchema);

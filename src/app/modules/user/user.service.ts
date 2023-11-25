@@ -1,14 +1,16 @@
-import { TUser } from './user.interface';
+import config from '../../config';
+import { TOrder, TUser } from './user.interface';
 import { User } from './user.model';
-
+import bcrypt from 'bcrypt';
 const createUserDB = async (user: TUser) => {
   const savedUser = await User.create(user);
   const result = await User.findOne(
     { userId: savedUser.userId },
-    { password: 0, orders: 0 },
+    { password: 0 },
   ).select({
     _id: 0,
     __v: 0,
+    orders: 0,
   });
   return result;
 };
@@ -45,6 +47,13 @@ const updateSingleUserDataIntoDB = async (userId: string, userData: TUser) => {
   const isUserExists = await User.isUserExists(userId);
 
   if (isUserExists) {
+    if (userData.password) {
+      userData.password = await bcrypt.hash(
+        userData.password,
+        Number(config.bcrypt_salt_rounds),
+      );
+    }
+
     const result = await User.findOneAndUpdate(
       { userId },
       { $set: userData },
@@ -71,10 +80,40 @@ const deleteSingleUserFromDB = async (userId: string) => {
   }
 };
 
+const AddNewProductInOrder = async (userId: string, orderData: TOrder) => {
+  const isUserExists = await User.isUserExists(userId);
+	
+  if (isUserExists) {
+    const user = await User.findOne({ userId });
+	
+    if (user && Array.isArray(user.orders) && user.orders.length > 0) {
+      const result = await User.updateOne(
+        { userId },
+        { $push: { orders: orderData } },
+      );
+	
+      return result;
+    } else {
+      const result = await User.updateOne(
+        { userId },
+        { $set: { orders: [orderData] } },
+   
+      );
+	
+      return result;
+    }
+  } else {
+    return null;
+  }
+};
+
+
+
 export const UserServices = {
   createUserDB,
   getAllUsersFromDB,
   getSingleUserFromDB,
   deleteSingleUserFromDB,
   updateSingleUserDataIntoDB,
+	AddNewProductInOrder
 };
