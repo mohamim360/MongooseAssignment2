@@ -207,6 +207,36 @@ const getUserOrder = async (req: Request, res: Response) => {
   }
 };
 
+const getTotalSumOfOrder = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const result = await UserServices.getTotalPriceOfSingleUserOrder(userId);
+
+    if (result) {
+      res.status(200).json({
+        success: true,
+        message: 'Total price calculated successfully!',
+        data: result,
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: 'User not found',
+        error: {
+          code: 404,
+          description: 'User not found!',
+        },
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: 'something went wrong in Validation',
+      error: err,
+    });
+  }
+};
+
 export const UserControllers = {
   createUser,
   getAllUsers,
@@ -214,5 +244,6 @@ export const UserControllers = {
   deleteSingleUser,
   updateSingleUser,
   updateNewOrder,
-	getUserOrder
+  getUserOrder,
+  getTotalSumOfOrder,
 };

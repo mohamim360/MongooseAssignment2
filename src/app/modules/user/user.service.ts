@@ -120,6 +120,32 @@ const getSingleUserOrderFromDB = async (userId: string) => {
   }
 };
 
+const getTotalPriceOfSingleUserOrder = async (userId: string) => {
+  const isUserExists = await User.isUserExists(userId);
+
+  if (isUserExists) {
+    const result = await User.aggregate([
+      {
+        $match: { userId: 1 },
+      },
+      {
+        $unwind: '$orders',
+      },
+      {
+        $group: {
+          _id: '$userId',
+          totalPrice: {
+            $sum: { $multiply: ['$orders.price', '$orders.quantity'] },
+          },
+        },
+      }
+    ]);
+		return result.length > 0 ? { totalPrice: result[0].totalPrice } : null
+  } else {
+    return null;
+  }
+};
+
 export const UserServices = {
   createUserDB,
   getAllUsersFromDB,
@@ -128,4 +154,5 @@ export const UserServices = {
   updateSingleUserDataIntoDB,
   AddNewProductInOrder,
   getSingleUserOrderFromDB,
+  getTotalPriceOfSingleUserOrder,
 };
