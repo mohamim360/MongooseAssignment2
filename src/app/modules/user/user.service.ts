@@ -1,10 +1,10 @@
-import { User } from './user.interface';
-import { UserModel } from './user.model';
+import { TUser } from './user.interface';
+import { User } from './user.model';
 
-const createUserDB = async (user: User) => {
+const createUserDB = async (user: TUser) => {
 
-  const savedUser = await UserModel.create(user);
-  const result = await UserModel.findOne(
+  const savedUser = await User.create(user);
+  const result = await User.findOne(
     { userId: savedUser.userId },
     { password: 0, orders: 0 },
   ).select({
@@ -15,7 +15,7 @@ const createUserDB = async (user: User) => {
 };
 
 const getAllUsersFromDB = async () => {
-  const result = await UserModel.find().select({
+  const result = await User.find().select({
     username: 1,
     fullName: 1,
     email: 1,
@@ -27,13 +27,21 @@ const getAllUsersFromDB = async () => {
 };
 
 const getSingleUserFromDB = async (userId: string) => {
-  const result = await UserModel.findOne({ userId }).select({
-    password: 0,
-    _id: 0,
-    __v: 0,
-    orders: 0,
-  });
-  return result;
+	const isUserExists = await User.isUserExists(userId);
+
+	if(isUserExists){
+		const result = await User.findOne({ userId }).select({
+			password: 0,
+			_id: 0,
+			__v: 0,
+			orders: 0,
+		});
+		return result;
+	}
+	else{
+		return null;
+	}
+  
 };
 
 export const UserServices = {

@@ -1,7 +1,8 @@
 import { Schema, model } from 'mongoose';
-import { Address, FullName, Order, User } from './user.interface';
-
-const fullNameSchema = new Schema<FullName>(
+import { TAddress, TFullName, TOrder, TUser, UserModel } from './user.interface';
+import bcrypt from 'bcrypt';
+import config from '../../config';
+const fullNameSchema = new Schema<TFullName>(
   {
     firstName: { type: String, required: [true, 'First name is required'] },
     lastName: { type: String, required: [true, 'Last name is required'] },
@@ -9,7 +10,7 @@ const fullNameSchema = new Schema<FullName>(
   { _id: false },
 );
 
-const addressSchema = new Schema<Address>(
+const addressSchema = new Schema<TAddress>(
   {
     street: { type: String, required: [true, 'Street is required'] },
     city: { type: String, required: [true, 'City is required'] },
@@ -18,7 +19,7 @@ const addressSchema = new Schema<Address>(
   { _id: false },
 );
 
-const orderSchema = new Schema<Order>(
+const orderSchema = new Schema<TOrder>(
   {
     productName: { type: String, required: [true, 'Product name is required'] },
     price: { type: Number, required: [true, 'Price is required'] },
@@ -27,7 +28,7 @@ const orderSchema = new Schema<Order>(
   { _id: false },
 );
 
-const userSchema = new Schema<User>({
+const userSchema = new Schema<TUser, UserModel>({
   userId: { type: Number, required: [true, 'User ID is required'], unique: true },
   username: { type: String, required: [true, 'Username is required'], unique: true },
   password: { type: String, required: [true, 'Password is required'] },
@@ -37,7 +38,24 @@ const userSchema = new Schema<User>({
   isActive: { type: Boolean, required: [true, 'isActive is required'] },
   hobbies: { type: [String], required: [true, 'Hobbies are required'] },
   address: { type: addressSchema, required: [true, 'Address is required'] },
-  orders: { type: [orderSchema] },
+  orders: { type: [orderSchema],required: false },
 });
 
-export const UserModel = model<User>('User', userSchema);
+userSchema.statics.isUserExists = async function (id: string) {
+  const existingUser = await User.findOne({ id });
+  return existingUser;
+};
+
+userSchema.pre('save', async function (next) {
+
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
+  const user = this; 
+  
+  user.password = await bcrypt.hash(
+    user.password,
+    Number(config.bcrypt_salt_rounds),
+  );
+  next();
+});
+
+export const User = model<TUser, UserModel>('User', userSchema);
