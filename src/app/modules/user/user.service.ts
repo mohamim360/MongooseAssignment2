@@ -2,6 +2,7 @@ import { User } from './user.interface';
 import { UserModel } from './user.model';
 
 const createUserDB = async (user: User) => {
+
   const savedUser = await UserModel.create(user);
   const result = await UserModel.findOne(
     { userId: savedUser.userId },
